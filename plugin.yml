@@ -1,0 +1,8 @@
+name: AreaAPI
+main: com.github.xzzpig.areaapi.Main
+version: 0.1
+author: Mg_P
+commands:
+  AreaAPI:
+    description: AreaAPI的主命令,输入/area help 查看帮助
+    aliases: [aa,area]
