@@ -13,7 +13,9 @@ public class SelectArea implements Listener{
 	private void onInteraction(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		int handid = player.getItemInHand().getTypeId();
-		Location loc = player.getLocation();
+		if(!event.hasBlock())
+			return;
+		Location loc = event.getClickedBlock().getLocation();
 		Action action = event.getAction();
 		if(handid == Vars.selectitem){
 			if(action.equals(Action.LEFT_CLICK_BLOCK)){

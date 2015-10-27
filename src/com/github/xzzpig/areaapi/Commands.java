@@ -1,10 +1,13 @@
 package com.github.xzzpig.areaapi;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import com.github.xzzpig.areaapi.event.AreaCreateEvent;
 
 public class Commands {
 	public static boolean create(CommandSender sender,Command cmd,String label,String[] args){
@@ -32,11 +35,14 @@ public class Commands {
 		else
 			area = args[1];
 		world = left.getWorld();
-		new Area(area,left,right).save();
+		Area areas = new Area(area,left,right);
+		areas.save();
 		sender.sendMessage(prefix+ "§a区域"+ args[1]+"已创建于");
 		sender.sendMessage(prefix+ "§aworld:"+world.getName());
 		sender.sendMessage(prefix+ "§a坐标1:"+left.getBlockX()+","+left.getBlockY()+","+left.getBlockZ());
 		sender.sendMessage(prefix+ "§a坐标2:"+right.getBlockX()+","+right.getBlockY()+","+right.getBlockZ());
+		AreaCreateEvent eve = new AreaCreateEvent(areas, player);
+		Bukkit.getServer().getPluginManager().callEvent(eve);
 		return true;
 	}
 
@@ -44,6 +50,11 @@ public class Commands {
 		String prefix = "§6["+cmd.getName()+"]§f";
 		if(args.length<2){
 			sender.sendMessage(prefix+"§aarea列表：");
+			if(Area.getAreas() == null)
+			{
+				sender.sendMessage(prefix+"§a无");
+				return true;
+			}
 			for(Area area:Area.getAreas()){
 				sender.sendMessage("§e-"+area.getName());
 			}
@@ -114,6 +125,15 @@ public class Commands {
 			sender.sendMessage(prefix + "§a已将选择区域延伸到天空和地底");
 		}
 		return false;
+	}
+	
+	public static boolean test(CommandSender sender,Command cmd,String label,String[] args){
+		if(!Debuger.isdebug)
+			return true;		
+		//String prefix = "§6["+cmd.getName()+"]§f";
+		Player player = (Player)sender;
+		Area.getAreas(player.getLocation())[0].denyEntity(player);
+		return true;
 	}
 }
 

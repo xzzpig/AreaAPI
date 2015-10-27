@@ -14,14 +14,16 @@ public class Statics
 	{
 		if(ints == null || ints.length == 0)
 			return 0;
-		Arrays.sort(ints.clone());
-		return ints[0];
+		int[] cints = ints.clone();
+		Arrays.sort(cints);
+		return cints[0];
 	}
 	public static int getMinid(int[] ints)
-	{
+	{		
 		if(ints == null || ints.length == 0)
 			return -1;
 		int min = getMin(ints);
+		Debuger.print(Arrays.toString(ints)+min);
 		for(int i =0;i<ints.length;i++)
 		{
 			if(ints[i]== min)

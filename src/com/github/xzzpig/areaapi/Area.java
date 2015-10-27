@@ -1,7 +1,14 @@
 package com.github.xzzpig.areaapi;
 import org.bukkit.*;
+
 import java.util.*;
+import java.util.Map.Entry;
+
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.*;
+
+import com.github.xzzpig.BukkitTools.TConfig;
+import com.github.xzzpig.BukkitTools.TString;
 
 public class Area
 {
@@ -21,7 +28,7 @@ public class Area
 		this.world = loc1.getWorld();
 		int x1,x2,y1,y2,z1,z2,xm,ym,zm,x0,y0,z0;
 		x1 = loc1.getBlockX();
-		x2 = loc2.getBlockY();
+		x2 = loc2.getBlockX();
 		y1 = loc1.getBlockY();
 		y2 = loc2.getBlockY();
 		z1 = loc1.getBlockZ();
@@ -61,19 +68,20 @@ public class Area
 		this.y = y0;
 		this.z = z0;
 		
-		this.areas.put(name,this);
+		Area.areas.put(name,this);
 	}
 	public Area(String name)
 	{
 		String world;
 		int x1,y1,z1,x2,y2,z2;
-		world = Vars.pl.getConfig().getString("Area."+name+".world",null);
-		x1 = Vars.pl.getConfig().getInt("Area."+name+".x1");
-		x2 = Vars.pl.getConfig().getInt("Area."+name+".x2");
-		y1 = Vars.pl.getConfig().getInt("Area."+name+".y1");
-		y2 = Vars.pl.getConfig().getInt("Area."+name+".y2");
-		z1 = Vars.pl.getConfig().getInt("Area."+name+".z1");
-		z2 = Vars.pl.getConfig().getInt("Area."+name+".z2");
+		FileConfiguration config = TConfig.getConfigFile("AreaAPI", "Area.yml");
+		world = config.getString("Area."+name+".world",null);
+		x1 = config.getInt("Area."+name+".x1");
+		x2 = config.getInt("Area."+name+".x2");
+		y1 = config.getInt("Area."+name+".y1");
+		y2 = config.getInt("Area."+name+".y2");
+		z1 = config.getInt("Area."+name+".z1");
+		z2 = config.getInt("Area."+name+".z2");
 		Location loc1 = new Location(Vars.pl.getServer().getWorld(world),x1,y1,z1);
 		Location loc2 = new Location(Vars.pl.getServer().getWorld(world),x2,y2,z2);
 		new Area(name,loc1,loc2);
@@ -103,7 +111,7 @@ public class Area
 			return false;
 		if(y1 < this.loc.getBlockY()||y1-this.loc.getBlockY() > this.y)
 			return false;
-		if(z1 < this.loc.getBlockZ()||x1-this.loc.getBlockZ() > this.z)
+		if(z1 < this.loc.getBlockZ()||z1-this.loc.getBlockZ() > this.z)
 			return false;
 		return true;
 	}
@@ -122,15 +130,16 @@ public class Area
 	public static Area[] getAreas()
 	{
 		List<Area> as = new ArrayList<Area>();
-		Iterator i = areas.keySet().iterator();
+		Iterator<Entry<String, Area>> i = areas.entrySet().iterator();
 		while(i.hasNext())
 		{
-			Area a = (Area) i.next();
+			Area a = (Area) i.next().getValue();
 			as.add(a);
 		}
 		if(as.size() == 0)
 			return null;
-		return (Area[])as.toArray();
+		as.toArray(new Area[0]);
+		return as.toArray(new Area[0]);
 	}
 	public static Area[] getAreas(Location loc1)
 	{
@@ -143,7 +152,7 @@ public class Area
 		}
 		if(as.size() == 0)
 			return null;
-		return (Area[])as.toArray();
+		return as.toArray(new Area[0]);
 	}
 	public static String getsAreas(Location loc1){
 		Area[] areas = getAreas(loc1);
@@ -158,7 +167,13 @@ public class Area
 	
 	public static void loadAreas()
 	{
-		List<String> areas = Vars.pl.getConfig().getStringList("Area");
+		String[] areas = null;
+		try {
+			areas = TConfig.getConfigPath("AreaAPI", "Area.yml","Area");
+		} catch (Exception e) {
+			TString.Print(Funs.prefix + "§4Area读取失败");
+			return;
+		}
 		for(String area:areas)
 		{
 			new Area(area);
@@ -175,18 +190,19 @@ public class Area
 		x2 = x1+this.x;
 		y2 = y1+this.y;
 		z2 = z1+this.z;
-		Vars.pl.getConfig().set("Area."+name+".world",world);
-		Vars.pl.getConfig().set("Area."+name+".x1",x1);
-		Vars.pl.getConfig().set("Area."+name+".x2",x2);
-		Vars.pl.getConfig().set("Area."+name+".y1",y1);
-		Vars.pl.getConfig().set("Area."+name+".y2",y2);
-		Vars.pl.getConfig().set("Area."+name+".z1",z1);
-		Vars.pl.getConfig().set("Area."+name+".z2",z2);
-		Vars.pl.saveConfig();
+		FileConfiguration config = TConfig.getConfigFile("AreaAPI","Area.yml");
+		config.set("Area."+name+".world",world);
+		config.set("Area."+name+".x1",x1);
+		config.set("Area."+name+".x2",x2);
+		config.set("Area."+name+".y1",y1);
+		config.set("Area."+name+".y2",y2);
+		config.set("Area."+name+".z1",z1);
+		config.set("Area."+name+".z2",z2);
+		TConfig.saveConfig("AreaAPI", config,"Area.yml");
 	}
 	public static void saveAreas()
 	{
-		Iterator i = areas.values().iterator();
+		Iterator<Area> i = areas.values().iterator();
 		while(i.hasNext())
 		{
 			Area a = (Area) i.next();
@@ -213,6 +229,7 @@ public class Area
 		return this.name;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public Player[] getInPlayer()
 	{
 		List<Player> ps = new ArrayList<Player>();
@@ -287,7 +304,7 @@ public class Area
 		x2 = this.x - x1;
 		y1 = eloc.getBlockY() - this.loc.getBlockY();
 		y2 = this.y - y1;
-		z1 = eloc.getBlockY() - this.loc.getBlockY();
+		z1 = eloc.getBlockZ() - this.loc.getBlockZ();
 		z2 = this.z - z1;
 		int[] ints = {x1,x2,y1,y2,z1,z2};
 		int minid = Statics.getMinid(ints);
@@ -312,5 +329,6 @@ public class Area
 				eloc.add(0,0,z2);
 				break;
 		}
+		entity.teleport(eloc);
 	}
 }

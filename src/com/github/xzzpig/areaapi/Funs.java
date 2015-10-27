@@ -1,10 +1,5 @@
 package com.github.xzzpig.areaapi;
 
-import java.util.ArrayList;
-
-import org.bukkit.Location;
-import org.bukkit.World;
-
 public class Funs {
 
 	static String prefix = "§6[AreaAPI]§r";
@@ -20,6 +15,5 @@ public class Funs {
 	public static void loadconfig(){
 		Vars.selectitem = Main.getPlugin(Main.class).getConfig().getInt("selectitem",271);
 	}
-
 }
 

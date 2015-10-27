@@ -1,7 +1,5 @@
 package com.github.xzzpig.areaapi;
 
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -14,6 +12,7 @@ public class Main extends JavaPlugin{
 	public void onEnable() {
 		getLogger().info(getName()+"插件已被加载");
 		getServer().getPluginManager().registerEvents(new SelectArea(), this);
+		getServer().getPluginManager().registerEvents(new EventTrigger(), this);
 		this.saveDefaultConfig();
 		Vars.pl = this;
 		Area.loadAreas();
@@ -59,6 +58,14 @@ public class Main extends JavaPlugin{
     			}
     			else
     				return Commands.select(sender, cmd, label, args);
+    		}
+    		else if(args[0].equalsIgnoreCase("test")){
+    			if (!(sender instanceof Player)){
+    				sender.sendMessage(Funs.prefix + "§4控制台无法该命令/<command> select");
+    				return true;
+    			}
+    			else
+    				return Commands.test(sender, cmd, label, args);
     		}
     		else
     			sender.sendMessage(Funs.prefix + "§4输入/area help查看帮助");

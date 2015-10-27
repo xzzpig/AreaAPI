@@ -1,10 +1,9 @@
 package com.github.xzzpig.areaapi;
 
 import java.util.HashMap;
-import java.util.List;
 
 import org.bukkit.Location;
-import org.bukkit.plugin.*;
+import org.bukkit.plugin.Plugin;
 
 public class Vars {
 	public static Plugin pl;
